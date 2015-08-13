@@ -1,10 +1,7 @@
 var config = require('../config/');
-var Mongo = require('mongodb');
+var Mongodb = require('mongodb');
+var Db = Mongodb.Db;
+var Collection = Mongodb.Collection;
+var Server = Mongodb.Server;
 
-var newDb = function(){
-    var Db = Mongo.Db;
-    var Connection = Mongo.Connection;
-    var Server = Mongo.Server;
-    return new Db(config.db.name,new Server(config.db.host,config.db.port));
-};
-module.exports = newDb;
+module.exports = new Db(config.db.name,new Server(config.db.host,config.db.port));
