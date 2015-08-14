@@ -1,16 +1,40 @@
 /* router config. */
 var bcrypt = require('bcrypt');
-var User = require('../models/user');
+var User = require('../models/user'),
+  Post = require('../models/post');
 var router = function (app) {
-    app.get('/', function(req, res, next) {
+    app.get('/', function(req, res) {
+      Post.get(null, function (err, posts) {
+        if (err) {
+          console.log(err);
+          posts = [];
+        }
         res.render('index', {
-            title: '主页',
-            user: req.session.user,
-            success: req.flash('success').toString(),
-            error: req.flash('error').toString()
+          title: '主页',
+          user: req.session.user,
+          posts : posts,
+          success: req.flash('success'),
+          error: req.flash('error')
         });
+      });
     });
-    app.get('/reg', function(req, res, next) {
+  app.get('/user/:name', function(req, res) {
+    Post.get(req.param('name'), function (err, posts) {
+      if (err) {
+        console.log(err);
+        posts = [];
+      }
+      res.render('index', {
+        title: req.param('name')+'的主页',
+        user: req.session.user,
+        posts : posts,
+        success: req.flash('success'),
+        error: req.flash('error')
+      });
+    });
+  });
+    app.get('/reg',checkLogin);
+    app.get('/reg', function(req, res) {
         res.render('reg', {
             title: '注册',
             user: req.session.user,
@@ -18,7 +42,8 @@ var router = function (app) {
             error: req.flash('error').toString()
         });
     });
-    app.post('/reg', function(req, res, next) {
+    app.post('/reg',checkLogin);
+    app.post('/reg', function(req, res) {
         var name = req.body['name'],
             password = req.body['password'],
             password_repeat = req.body['password-repeat'];
@@ -52,7 +77,8 @@ var router = function (app) {
             });
         });
     });
-    app.get('/login', function(req, res, next) {
+    app.get('/login',checkLogin);
+    app.get('/login', function(req, res) {
         res.render('login', {
             title: '登录',
             user: req.session.user,
@@ -60,7 +86,8 @@ var router = function (app) {
             error: req.flash('error').toString()
         });
     });
-    app.post('/login', function(req, res, next) {
+    app.post('/login',checkLogin);
+    app.post('/login', function(req, res) {
         var name = req.body['name'],
             password = req.body['password'];
         User.get(name,function(err,user){
@@ -81,12 +108,14 @@ var router = function (app) {
             res.redirect('/');
         });
     });
-    app.get('/logout', function(req, res, next) {
+    app.get('/logout',checkNotLogin);
+    app.get('/logout', function(req, res) {
         req.session.user = null;
         req.flash('success','退出成功');
         res.redirect('/');
     });
-    app.get('/post', function(req, res, next) {
+    app.get('/post',checkNotLogin);
+    app.get('/post', function(req, res) {
         res.render('post', {
             title: '发布信息',
             user : req.session.user,
@@ -94,13 +123,38 @@ var router = function (app) {
             error : req.flash('error')
         });
     });
-    app.post('/post', function(req, res, next) {
+    app.post('/post',checkNotLogin);
+    app.post('/post', function(req, res) {
+      var post = new Post({
+        name:req.session.user.name,
+        title:req.body['title'],
+        content:req.body['content']
+      });
+      post.save(function(err){
+        if(err){
+          req.flash('error',err);
+          return res.redirect('/');
+        }
+        req.flash('success','发布成功');
+        res.redirect('/');
+      });
     });
-    app.get('/users/',function(req,res,next){
-        res.render('index',{title:'用户首页'});
-    });
-
-}
+};
 
 
 module.exports = router;
+
+function checkLogin(req,res,next){
+  if(req.session.user){
+      req.flash('error','用户已登录');
+      res.redirect('back');
+  };
+    next();
+};
+function checkNotLogin(req,res,next){
+    if(!req.session.user){
+        req.flash('error','用户未登录');
+        res.redirect('/login');
+    };
+    next();
+}

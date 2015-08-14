@@ -1,3 +1,10 @@
 <%- include header%>
-This is home page!
+<% posts.forEach(function (post, index) { %>
+<p><h2><a href="#"><%= post.title %></a></h2></p>
+<p class="info">
+	作者：<a href="/user/<%= post.name %>"><%= post.name %></a> |
+	日期：<%= post.time %>
+</p>
+<p><%- post.content %></p>
+<% }) %>
 <%- include footer%>
