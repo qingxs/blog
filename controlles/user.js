@@ -1,4 +1,5 @@
 var bcrypt = require('bcrypt');
+var crypto = require('crypto');
 var User = require('../models/user');
 var check = require('./checkLogin');
 
@@ -21,7 +22,8 @@ exports.reg.post = function(req, res) {
     req.flash('error', '两次密码输入不一致');
     return res.redirect('/reg');
   }
-  var passhash = bcrypt.hashSync(password, 10);
+  // var passhash = bcrypt.hashSync(password, 10);
+  var passhash = crypto.createHash('md5').update(password).digest('hex');
   var newUser = new User({
     name: name,
     password: passhash,
@@ -72,7 +74,8 @@ exports.login.post = function(req,res){
       req.flash('error','用户不存在');
       return res.redirect('/login');
     }
-    if(!bcrypt.compareSync(password,user.password)){
+    //if(!bcrypt.compareSync(password,user.password)){
+    if (user.password !== crypto.createHash('md5').update(password).digest('hex')) {
       req.flash('error','登录密码错误');
       return res.redirect('/login');
     }
