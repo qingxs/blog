@@ -1,6 +1,6 @@
 /* router config. */
-var user = require('../controlles/user'),
-    art = require('../controlles/article');
+var user = require('../controllers/user'),
+  art = require('../controllers/article');
 
 
 var router = function (app) {
