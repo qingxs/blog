@@ -6,11 +6,24 @@ var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var session = require('express-session');
 var MongoStore = require('connect-mongo')(session);
-
+//var multer = require('multer');
 
 var routes = require('./config/routes');
 var config = require('./config/');
 var flash = require('connect-flash');
+
+
+//var storage = multer.diskStorage({
+//  destination: function (req, file, cb) {
+//    cb(null, '../public/uploads')
+//  },
+//  filename: function (req, file, cb) {
+//    cb(null, file.fieldname + '-' + Date.now())
+//  }
+//});
+//
+//var uploader = multer({storage : storage});
+
 //var users = require('./routes/users');
 
 var app = express();
@@ -27,6 +40,7 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
+//app.use(multer({ dest: './public/uploads/' }));
 
 app.use(session({
   secret : config.cookieSecret,
