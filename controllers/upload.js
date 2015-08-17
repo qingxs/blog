@@ -1,7 +1,25 @@
 /**
  * Created by qing.liu on 2015/8/17.
  */
+var multer = require('multer');
 var check = require('./checkLogin');
+
+var storage = multer.diskStorage({
+  destination: './public/uploads/',
+  filename: function (req, file, cb) {
+    var _info = file.originalname.split('.');
+    var _extName = _info.pop().toLowerCase();
+    var _fileName = _info.join('-') + '_' + Date.now() +'.' + _extName;
+    cb(null,_fileName);
+  }
+});
+var limit ={
+  fileSize:1024*1024*100
+};
+var uploader = multer({
+  storage: storage,
+  limit:limit
+}).array('files');
 
 exports.form = function (req, res) {
   check.isLogin(req, res, 'notLogin');
@@ -14,8 +32,12 @@ exports.form = function (req, res) {
 };
 exports.save = function (req, res) {
   check.isLogin(req, res, 'notLogin');
-  //upload
-
-  req.flash('success', '文件上传成功!');
+  uploader(req,res,function(err,req,res){
+    if(err){
+      console.log(err);
+      return err;
+    }
+  });
+  req.flash('success', '文件上传成功!!!');
   res.redirect('/upload');
 };
