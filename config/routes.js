@@ -6,7 +6,7 @@ var user = require('../controllers/user'),
 
 var router = function (app) {
   app.get('/',art.index);
-  app.get('/user/:name', art.userIndex);
+  app.get(/\/user\/([^\/]*)?\/?([^\/]*)?\/?/ig, art.user);
   app.get('/reg', user.reg.form);
   app.post('/reg', user.reg.post);
   app.get('/login', user.login.form);

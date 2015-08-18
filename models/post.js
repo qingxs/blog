@@ -35,7 +35,7 @@ Post.prototype.save = function(callback){
     });
   });
 };
-Post.get = function(name,callback){
+Post.get = function (queryParam, callback) {
   mongo.open(function(err,db){
     if (err) return callback(err);
     db.collection('posts',function(err,collection){
@@ -44,7 +44,8 @@ Post.get = function(name,callback){
         return callback(err);
       };
       var query = {};
-      if(name){query.name = name;}
+      if (queryParam[0])query.name = queryParam[0];
+      if (queryParam[1])query.title = queryParam[1];
       collection.find(query)
         .sort({time : -1})
         .toArray(function(err,docs){

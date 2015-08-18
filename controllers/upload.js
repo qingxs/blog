@@ -3,7 +3,7 @@
  */
 var multer = require('multer');
 var check = require('./checkLogin');
-
+var util = require('util');
 var storage = multer.diskStorage({
   destination: './public/uploads/',
   filename: function (req, file, cb) {
@@ -30,14 +30,20 @@ exports.form = function (req, res) {
     error: req.flash('error').toString()
   });
 };
-exports.save = function (req, res) {
+exports.save = function (req, res, next) {
   check.isLogin(req, res, 'notLogin');
-  uploader(req,res,function(err,req,res){
+  uploader(req, res, function (err) {
     if(err){
       console.log(err);
       return err;
     }
+    console.log(util.inspect(res, true, 3));
   });
+
+  //这里怎么取得上传文件保存的文件名？
+
+  //console.log(uploader)
   req.flash('success', '文件上传成功!!!');
   res.redirect('/upload');
 };
+
