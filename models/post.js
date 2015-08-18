@@ -4,6 +4,7 @@
 var mongo = require('./db');
 var markdown = require('markdown');
 var moment = require('moment');
+var util = require('util');
 
 function Post(post){
   this.name = post.name;
@@ -44,19 +45,32 @@ Post.get = function (queryParam, callback) {
         return callback(err);
       };
       var query = {};
-      if (queryParam[0])query.name = queryParam[0];
-      if (queryParam[1])query.title = queryParam[1];
-      collection.find(query)
-        .sort({time : -1})
-        .toArray(function(err,docs){
-          mongo.close();
-          if(err) return callback(err);
-          docs.forEach(function (doc) {
-            doc.content = markdown.parse(doc.content);
-            doc.time = moment(doc.time).format('YYYY-MM-DD HH:mm:ss');
+
+      if (queryParam) {
+        if (queryParam[0])query.name = queryParam[0];
+        if (queryParam[1])query.title = queryParam[1];
+      }
+      if (!query.title) {
+        collection.find(query)
+          .sort({time: -1})
+          .toArray(function (err, docs) {
+            mongo.close();
+            if (err) return callback(err);
+            docs.forEach(function (doc) {
+              doc.content = markdown.parse(doc.content);
+              doc.time = moment(doc.time).format('YYYY-MM-DD HH:mm');
+            });
+            callback(null, docs);
           });
-          callback(null,docs);
-        })
+      } else {
+        collection.findOne(query, function (err, doc) {
+          mongo.close();
+          if (err) return callback(err);
+          doc.content = markdown.parse(doc.content);
+          doc.time = moment(doc.time).format('YYYY-MM-DD HH:mm');
+          callback(null, doc);
+        });
+      }
     });
   });
 };

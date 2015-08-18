@@ -27,8 +27,8 @@ exports.user = function (req, res) {
       console.log(err);
       posts = [];
     }
-    res.render('index', {
-      title: req.params[0] + (req.params[1] || ''),
+    res.render(req.params[1] ? 'article' : 'index', {
+      title: req.params[1] || req.params[0] + '的博客',
       user: req.session.user,
       posts : posts,
       success: req.flash('success'),
