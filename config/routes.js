@@ -14,6 +14,9 @@ var router = function (app) {
   app.get('/logout', user.logout);
   app.get('/post',art.post.form);
   app.post('/post', art.post.save);
+  app.get('/edit/:id',art.post.edit);
+  app.post('/edit/:id',art.post.update);
+  app.all('/remove/:id',art.post.remove);
   app.get('/upload', upload.form);
   app.post('/upload',upload.save);
 };

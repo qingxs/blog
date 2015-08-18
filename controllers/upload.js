@@ -40,8 +40,6 @@ exports.save = function (req, res, next) {
     console.log(util.inspect(res, true, 3));
   });
 
-  //这里怎么取得上传文件保存的文件名？
-
   //console.log(uploader)
   req.flash('success', '文件上传成功!!!');
   res.redirect('/upload');
