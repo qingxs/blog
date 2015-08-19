@@ -1,0 +1,17 @@
+<br/>
+<% posts.comments.forEach(function (comment, index) { %>
+<p>
+	<% if(comment.name){ %>
+	<a href="/user/<%= comment.name %>/"><%= comment.name %></a>
+	<% }else{ %>
+	<a class="guest">访客</a>
+	<% } %>
+	<span class="info"> 回复于 <%= comment.time %></span></p>
+<p><%- comment.content %></p>
+<% }) %>
+
+<form method="post">
+	<textarea name="content" rows="5" cols="80"></textarea><br/>
+	<input type="hidden" value="<%= posts._id %>" name="id"/>
+	<input type="submit" value="留言"/>
+</form>

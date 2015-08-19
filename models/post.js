@@ -6,6 +6,7 @@ var ObjectID = require('mongodb').ObjectID;
 var markdown = require('markdown');
 var moment = require('moment');
 var util = require('util');
+var config = require('../config/');
 
 function Post(post){
   this.name = post.name;
@@ -19,7 +20,8 @@ Post.prototype.save = function(callback){
     name : this.name,
     title : this.title,
     content : this.content,
-    time : new Date()
+    time: new Date(),
+    comments: []
   };
   mongo.open(function(err,db){
     if(err){
@@ -73,7 +75,8 @@ Post.remove = function(id,callback){
     });
   })
 };
-Post.get = function (queryParam, callback) {
+Post.get = function (queryParam, page, callback) {
+  console.log('page:' + page);
   mongo.open(function(err,db){
     if (err) return callback(err);
     db.collection('posts',function(err,_posts){
@@ -82,25 +85,36 @@ Post.get = function (queryParam, callback) {
         return callback(err);
       };
       var query = {};
-      console.log(util.inspect(queryParam));
       if (queryParam) {
         if (queryParam[0])query.name = queryParam[0];
         if (queryParam[1])query.title = queryParam[1];
         if (queryParam.id)query._id = ObjectID(queryParam.id);
-
       }
       if (!query.title && !query._id) {
-        _posts.find(query)
-          .sort({time: -1})
-          .toArray(function (err, docs) {
-            mongo.close();
-            if (err) return callback(err);
-            docs.forEach(function (doc) {
-              doc.content = markdown.parse(doc.content);
-              doc.time = moment(doc.time).format('YYYY-MM-DD HH:mm');
+        _posts.count(query, function (err, total) {
+
+          if (err) return callback(err);
+          var queryLimit = {limit: config.limit};
+          if (util.isNumber(page)) {
+            page = page < 1 ? 1 : page;
+            var maxPage = Math.ceil(total / page);
+            page = page > maxPage ? maxPage : page;
+            queryLimit.limit = config.limit;
+            queryLimit.skip = (page - 1) * config.limit;
+          }
+          console.log(util.inspect(queryLimit) + '_' + page);
+          _posts.find(query, queryLimit)
+            .sort({time: -1})
+            .toArray(function (err, docs) {
+              mongo.close();
+              if (err) return callback(err);
+              docs.forEach(function (doc) {
+                doc.content = markdown.parse(doc.content);
+                doc.time = moment(doc.time).format('YYYY-MM-DD HH:mm');
+              });
+              callback(null, docs, total);
             });
-            callback(null, docs);
-          });
+        });
       } else {
         _posts.findOne(query, function (err, doc) {
           mongo.close();
@@ -109,6 +123,10 @@ Post.get = function (queryParam, callback) {
           if(doc){
             if (!query._id) doc.content = markdown.parse(doc.content);
             doc.time = moment(doc.time).format('YYYY-MM-DD HH:mm');
+            doc.comments.forEach(function (comment) {
+              comment.content = markdown.parse(comment.content);
+              comment.time = moment(comment.time).format('YYYY-MM-DD HH:mm');
+            });
           }
           callback(null, doc);
         });

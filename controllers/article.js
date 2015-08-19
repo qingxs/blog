@@ -2,10 +2,13 @@
  * Created by qing.liu on 2015/8/17.
  */
 var Post = require('../models/post');
+var Comment = require('../models/comment');
 var check = require('./checkLogin');
 var util = require('util');
 exports.index = function(req, res) {
-  Post.get(null, function (err, posts) {
+  //console.log(util.inspect(req.params[1]));
+  //return;
+  Post.get(null, req.params[2] * 1 || null, function (err, posts) {
     if (err) {
       console.log(err);
       posts = [];
@@ -22,7 +25,8 @@ exports.index = function(req, res) {
 
 exports.user = function (req, res) {
  // console.log(util.inspect(req.params, 2));
-  Post.get(req.params, function (err, posts) {
+  Post.get(req.params, req.params[3], function (err, posts) {
+    console.log(util.inspect(req.params));
     if (err) {
       console.log(err);
       posts = [];
@@ -36,6 +40,28 @@ exports.user = function (req, res) {
     });
   });
 };
+
+exports.comment = function (req, res) {
+  var comment = new Comment({
+    'id': req.body['id'],
+    'comment': {
+      'content': req.body['content'],
+      'time': new Date()
+    }
+  });
+  if (req.session.user) {
+    comment.comment.name = req.session.user.name;
+  }
+  comment.save(function (err) {
+    if (err) {
+      req.flash('error', err);
+      return res.redirect('back');
+    }
+    req.flash('success', '留言成功');
+    res.redirect('back');
+  });
+};
+
 exports.post = {
   form : function (req, res) {
     check.isLogin(req, res, 'notLogin');
@@ -48,7 +74,10 @@ exports.post = {
   },
   save : function (req, res) {
     check.isLogin(req, res, 'notLogin');
-    Post.get({'0':req.session.user.name,'1':req.body['title']},function(err,post){
+    Post.get({
+      '0': req.session.user.name,
+      '1': req.body['title']
+    }, null, function (err, post) {
       if(err){
         req.flash('error',err);
         return res.redirect('back');

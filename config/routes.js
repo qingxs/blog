@@ -5,8 +5,9 @@ var user = require('../controllers/user'),
 
 
 var router = function (app) {
-  app.get('/',art.index);
-  app.get(/\/user\/([^\/]*)?\/?([^\/]*)?\/?$/i, art.user);
+  app.get(/^\/$|^\/(index\/?(page(\d+)\/?)?)$/i, art.index);
+  app.get(/^\/user\/([^\/]+)\/?((?!(page\d+))?|[^\/]+)\/?(?:page(\d+)\/?)?$/i, art.user);
+  app.post(/\/user\/([^\/]*)\/([^\/]*)\/?(page\d+\/?)?$/i, art.comment);
   app.get('/reg', user.reg.form);
   app.post('/reg', user.reg.post);
   app.get('/login', user.login.form);

@@ -30,6 +30,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.use(session({
   secret : config.cookieSecret,
+  limit: config.limit,
   key : config.db.name,
   cookie : {maxAge : 1000 * 60 * 60 * 24 * 30},
   store : new MongoStore({
