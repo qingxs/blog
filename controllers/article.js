@@ -8,7 +8,7 @@ var util = require('util');
 exports.index = function(req, res) {
   //console.log(util.inspect(req.params[1]));
   //return;
-  Post.get(null, req.params[2] * 1 || null, function (err, posts) {
+  Post.get(null, req.params[2] * 1 || 1, function (err, posts, pi) {
     if (err) {
       console.log(err);
       posts = [];
@@ -17,6 +17,8 @@ exports.index = function(req, res) {
       title: '主页',
       user: req.session.user,
       posts : posts,
+      pi: pi,
+      baseURI: '/index/',
       success: req.flash('success'),
       error: req.flash('error')
     });
@@ -25,8 +27,8 @@ exports.index = function(req, res) {
 
 exports.user = function (req, res) {
  // console.log(util.inspect(req.params, 2));
-  Post.get(req.params, req.params[3], function (err, posts) {
-    console.log(util.inspect(req.params));
+  Post.get(req.params, req.params[3] * 1 || 1, function (err, posts, pi) {
+    //console.log(util.inspect(req.params));
     if (err) {
       console.log(err);
       posts = [];
@@ -35,6 +37,8 @@ exports.user = function (req, res) {
       title: req.params[1] || req.params[0] + '的博客',
       user: req.session.user,
       posts : posts,
+      pi: pi,
+      baseURI: '/user/' + req.params[0] + '/' + (req.params[1] ? req.params[1] + '/' : ''),
       success: req.flash('success'),
       error: req.flash('error')
     });

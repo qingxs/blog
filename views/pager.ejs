@@ -1,0 +1,44 @@
+<% if(pi.maxPage > 1){ %>
+<p class="pages">
+	<span class="firstPage">
+		<% if(pi.page > 1){ %>
+		<a href="<%= baseURI + 'page1/' %>">第一页</a>
+		<% }else{ %>
+		第一页
+		<% } %>
+	</span>
+	<span class="prePage">
+		<% if(pi.page > 1){ %>
+		<a href="<%= baseURI + 'page' + (pi.page - 1) + '/' %>">上一页</a>
+		<% }else{ %>
+		上一页
+		<% } %>
+	</span>
+	<%
+		var tmpPage = 0;
+			while(tmpPage++ < pi.maxPage) {
+	%>
+	<span class="pageItem">[
+		<% if (tmpPage == pi.page){ %>
+		<%= tmpPage %>
+		<% }else{ %>
+		<a href="<%= baseURI + 'page' + tmpPage %>/"><%= tmpPage %></a>
+		<% } %>
+		]</span>
+	<% } %>
+	<span class="nextPage">
+		<% if(pi.page < pi.maxPage){ %>
+		<a href="<%= baseURI + 'page' + (pi.page + 1) + '/' %>">下一页</a>
+		<% }else{ %>
+		下一页
+		<% } %>
+	</span>
+	<span class="lastPage">
+		<% if(pi.page < pi.maxPage){ %>
+		<a href="<%= baseURI + 'page' + pi.maxPage + '/' %>">最末页</a>
+		<% }else{ %>
+		最末页
+		<% } %>
+	</span>
+</p>
+<% } %>

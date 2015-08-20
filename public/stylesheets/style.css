@@ -13,3 +13,34 @@ pre{font-size: 0.8em;font-family:arial, sans-serif;color:#333; background: #f3f3
 .info{font-size:14px;}
 .edit{margin:3px;padding:2px 5px;border-radius:3px;background-color:#f3f3f3;color:#333;font-size:13px;}
 .edit:hover{text-decoration:none;background-color:#f00;color:#fff;-webkit-transition:color .2s linear;}
+
+.pages {
+    text-decoration: none;
+    padding: .5em 1em;
+    color: #999999;
+}
+
+.pages span {
+    margin: .1em .5em;
+}
+
+.pages a {
+    color: #cc0000;
+}
+
+.prePage {
+}
+
+.nextPage {
+}
+
+.pageItem a {
+    font-weight: bold;
+}
+
+.pages a:hover {
+    background-color: #cc0000;
+    color: #f9f9f9;
+    -webkit-transition: color .2s linear;
+    text-decoration: none;
+}

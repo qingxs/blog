@@ -76,7 +76,7 @@ Post.remove = function(id,callback){
   })
 };
 Post.get = function (queryParam, page, callback) {
-  console.log('page:' + page);
+  //console.log('page:' + page);
   mongo.open(function(err,db){
     if (err) return callback(err);
     db.collection('posts',function(err,_posts){
@@ -97,12 +97,12 @@ Post.get = function (queryParam, page, callback) {
           var queryLimit = {limit: config.limit};
           if (util.isNumber(page)) {
             page = page < 1 ? 1 : page;
-            var maxPage = Math.ceil(total / page);
+            var maxPage = Math.ceil(total / config.limit);
             page = page > maxPage ? maxPage : page;
             queryLimit.limit = config.limit;
             queryLimit.skip = (page - 1) * config.limit;
           }
-          console.log(util.inspect(queryLimit) + '_' + page);
+          //console.log(util.inspect(maxPage) + '_' + page);
           _posts.find(query, queryLimit)
             .sort({time: -1})
             .toArray(function (err, docs) {
@@ -112,7 +112,12 @@ Post.get = function (queryParam, page, callback) {
                 doc.content = markdown.parse(doc.content);
                 doc.time = moment(doc.time).format('YYYY-MM-DD HH:mm');
               });
-              callback(null, docs, total);
+              var pi = {
+                'page': page,
+                'maxPage': maxPage,
+                'total': total
+              };
+              callback(null, docs, pi);
             });
         });
       } else {
